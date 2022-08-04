@@ -1,0 +1,2 @@
+# Properties of restricted randomization
+ 
