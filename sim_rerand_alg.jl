@@ -1,5 +1,5 @@
-#This code has been tested with Julia version 1.5.1. Note that later versions of Julia
-#will have a different random number generator
+#This code has been tested with Julia version 1.5.1. Note that later versions
+#of Julia will have a different random number generator
 using Distributions #Tested with version 0.23.8
 using Random
 using LinearAlgebra
@@ -198,6 +198,7 @@ function sim_study()
     c = 0
     for i = INNER_REPS
         OUT = Array{Any}(undef, i, length(namelist))
+        q = ""
         for k = 1:i
             X = transpose(rand(A, N))
             wset_rerand_set, nr_tried_rerand_set, m_max_rerand_set =
@@ -214,6 +215,7 @@ function sim_study()
             h_alg = length(wset_alg)*2
             append!(out, [as_cor_alg, nr_tried_alg, m_max_alg, h_alg, seed])
             OUT[k, :] = out
+            q = q * string(X) * "\n"
         end
         df = DataFrame(OUT, :auto)
         rename!(df, Symbol.(namelist))
@@ -222,6 +224,9 @@ function sim_study()
         else
             CSV.write(FILENAME, df, append=true)
         end
+        io2 = open(FILENAME2, "a")
+        write(io2, q)
+        close(io2)
         c += i
         print_time(c, sum(INNER_REPS))
     end
@@ -231,19 +236,19 @@ end
 #while still make results reproducible, 5 different scripts was run with
 #5 different seed values with 2000 reps each (TOT_REPS constant below).
 #The seed values chosen were 1, 12, 123, 1234 and 12345.
-seed = 12345
+seed = 1234
 N = 50
 H = 10000
 K = 5
 PA_LIST = [1, 0.1, 0.01, 0.001]
 TOT_REPS = 2000
-inner_rep_target = 10
+inner_rep_target = 1
 
 MV = zeros(K)
 CM = Matrix{Float64}(I, K, K)
 
 #Set distribution (normal or lognormal)
-distr = "normal"
+distr = "lognormal"
 if distr == "normal"
     A = MvNormal(MV, CM)
 elseif distr == "lognormal"
@@ -261,6 +266,7 @@ end
 append!(namelist, ["as_cor_alg", "nr_alg", "m_max_alg", "act_h_alg", "seed"])
 
 FILENAME = string("rerand_alg_", distr, "_", string(N), ".csv")
+FILENAME2 = string("rerand_alg_", distr, "_X_", string(N), ".csv")
 
 START_TIME = time_ns()
 Random.seed!(seed)

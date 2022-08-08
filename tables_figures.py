@@ -34,27 +34,19 @@ def gen_tab_prep_fig(file, N, s1=1, s2=4):
     
     df.rename(columns={'as_cor_alg': 'as_cor_rerand5'}, inplace=True)
 
-    for i in range(1,6):
-        df['std_inc_rerand' + str(i)] = 100 * np.sqrt(2 * (
-            df['as_cor_rerand' + str(i)] - 1/(N-1)))
-    
 
-    dfl = pd.wide_to_long(df, stubnames=['as_cor_rerand', 'std_inc_rerand'],
+    dfl = pd.wide_to_long(df, stubnames=['as_cor_rerand'],
                          i='id', j='type').reset_index()
 
     return dfl, ('$p_A=1$' + get_dist_vals(df['as_cor_rerand1'], s2) + '\n' +
-            '& & & & & & & \\\\ \n' + 
+            '\\addlinespace\n' + 
             '$p_A=0.1$' + get_dist_vals(df['as_cor_rerand2'], s2) + '\n' +
-            get_dist_vals(df['std_inc_rerand2'], s1, True) + '\n' +
             '\\addlinespace\n' + 
             '$p_A=0.01$' + get_dist_vals(df['as_cor_rerand3'], s2) + '\n' +
-            get_dist_vals(df['std_inc_rerand3'], s1, True) + '\n' +
             '\\addlinespace\n' + 
             '$p_A=0.001$' + get_dist_vals(df['as_cor_rerand4'], s2) + '\n' +
-            get_dist_vals(df['std_inc_rerand4'], s1, True) + '\n' +
             '\\addlinespace\n' + 
             'PS-alg' + get_dist_vals(df['as_cor_rerand5'], s2) + '\n' +
-            get_dist_vals(df['std_inc_rerand5'], s1, True) + '\n' +
             '\\addlinespace\n')
 
 
@@ -72,52 +64,28 @@ def gen_seaborn_figs(dfn, dfl, outfile):
     plt.rc('xtick', labelsize=fc-2) 
     plt.rc('ytick', labelsize=fc-2)
     
-    fig, axes = plt.subplots(2, 2, figsize=(16,16))
+    fig, axes = plt.subplots(1, 2, figsize=(16,8))
     
     sns.stripplot('lab', 'as_cor_rerand', jitter=.4, data=dfn,
-                       color='#F5793A', s=1.5, alpha=1, ax=axes[0,0])
-    axes[0,0].set_ylim([0.0198, 0.0242])
-    axes[0,0].set_xlabel('')
-    axes[0,0].set_ylabel('')
-    axes[0,0].set_yticks([.02, .021, .022, .023, .024])
-    axes[0,0].axhline(1/(N-1), ls='--')
+                       color='#F5793A', s=1.5, alpha=1, ax=axes[0])
+    axes[0].set_ylim([0.0198, 0.0242])
+    axes[0].set_xlabel('')
+    axes[0].set_ylabel('')
+    axes[0].set_yticks([.02, .021, .022, .023, .024])
+    axes[0].axhline(1/(N-1), ls='--')
     
     sns.stripplot('lab', 'as_cor_rerand', jitter=.4, data=dfl,
-                       color='#F5793A', s=1.5, alpha=1, ax=axes[0,1])
-    axes[0,1].set_ylim([0, .18])
-    axes[0,1].set_xlabel('')
-    axes[0,1].set_ylabel('')
-    axes[0,1].set_yticks([0, .05, .1, .15])
-    axes[0,1].axhline(1/(N-1), ls='--')
-
-    dfn = dfn[dfn['type'] != 1]
-    dfn['lab'] = dfn['type'].replace(di2)
+                       color='#F5793A', s=1.5, alpha=1, ax=axes[1])
+    axes[1].set_ylim([0, .18])
+    axes[1].set_xlabel('')
+    axes[1].set_ylabel('')
+    axes[1].set_yticks([0, .05, .1, .15])
+    axes[1].axhline(1/(N-1), ls='--')
     
-    dfl = dfl[dfl['type'] != 1]
-    dfl['lab'] = dfl['type'].replace(di2)
-    
-    sns.stripplot('lab', 'std_inc_rerand', jitter=.4, data=dfn,
-                       color='#F5793A', s=1.5, alpha=1, ax=axes[1,0])
-    axes[1,0].set_ylim([0, 8])
-    axes[1,0].set_xlabel('')
-    axes[1,0].set_ylabel('')
-    axes[1,0].set_yticks([0, 2.5, 5, 7.5])
-    
-    sns.stripplot('lab', 'std_inc_rerand', jitter=.4, data=dfl,
-                       color='#F5793A', s=1.5, alpha=1, ax=axes[1,1])
-    axes[1,1].set_ylim([0, 60])
-    axes[1,1].set_xlabel('')
-    axes[1,1].set_ylabel('')
-    axes[1,1].set_yticks([0, 25, 50]) 
-    
-    axes[0,0].set_title('Normal covariates,' + '\n' +
+    axes[0].set_title('Normal covariates,' + '\n' +
                         'assignment correlation', fontsize=fc)
-    axes[0,1].set_title('Log-normal covariates,' + '\n' +
+    axes[1].set_title('Log-normal covariates,' + '\n' +
                         'assignment correlation', fontsize=fc)
-    axes[1,0].set_title('Normal covariates,' + '\n' +
-                        'percent increase MSE', fontsize=fc)
-    axes[1,1].set_title('Log-normal covariates,' + '\n' +
-                        'percent increase MSE', fontsize=fc)
 
     plt.savefig(outfile, bbox_inches='tight', pad_inches=0)
 
@@ -145,9 +113,9 @@ q = ('\\begin{tabular*}{\\textwidth}{@{\\hskip\\tabcolsep\\extracolsep\\fill}'
      'l*{1}{cccccccc}}\\toprule\n & & & & \\multicolumn{4}{c}{Quantiles}\\\\\n' 
      '\\cmidrule(lr){5-8}& Mean & Min & Max & 0.5 & 0.75 & 0.975 & 0.999\\\\\n' 
      '\\midrule\\addlinespace\\multicolumn{8}{l}{\\textit{Five standard normal'
-     ' covariates}}\\\\\n\\addlinespace')
+     ' covariates}}\\\\\n\\addlinespace\n')
 w = ('\\addlinespace\\multicolumn{8}{l}{\\textit{Five log-normal covariates}}'
-     '\\\\\n\\addlinespace')
+     '\\\\\n\\addlinespace\n')
 v = '\\bottomrule\\end{tabular*}'
 
 #Generate table 1 (and Table A2 in the supplementary material for N=100)

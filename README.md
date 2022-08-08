@@ -2,7 +2,8 @@
  
 The code is either Julia or Python code. Below, a short description of each of these different files and their purposes are given:
 - `sim_rerand_alg.jl`: This code performs the simulations discussed in Section 3.4 in the paper. This file should be run for both normal and lognormal covariates and with sample size of 50 and 100 with five different seeds (documented in the file). It takes a number of days to perform all necessary simulations on a standard desktop computer.
-- `tables_figures.py`: Python file for taking all the data generated in the sim_rerand_alg.jl file and turning them into Figure 1 and Table 1 in the paper, as well as Figure A1 and Table A2 in the supplementary material.
+- `tables_figures.py`: Python file for taking all the data generated in the sim_rerand_alg.jl file and turning them into Figure 1 and Table 1 in the paper, as well as Figure A1 and Table A2 in the supplementary material. Requires `sim_rerand_alg.jl` to have been run first.
 - `proofs.jl`: Julia file which go through all the steps for the proofs of theorems 3 and 4. This file can be used to help confirm that each of the steps taken in the proofs are correct.
 - `get_probabilities.py`: Python file which uses Sympy (Python library for symbolic mathematics). This file calculates the steps to go from equations A27, A28 and A29 in the supplementary material to the different probabilities associated with the three equations. These steps are tedious and involve going through large sums of binomial coefficients. It is therefore best left for Sympy to solve.
-- `sim_distr_mse_r2.jl`: Code to perform the simulations discussed in Section 3.5 in the paper. 
+- `sim_distr_mse_r2.jl`: Code to perform the simulations discussed in Section 3.5 in the paper. Requires `sim_rerand_alg.jl` to have been run first.
+- `plots_distr_mse_r2.jl`: Code to generate figures 2 and 3 in the paper and figure A2 in the supplementary material. Requires `sim_rerand_alg.jl` and `sim_distr_mse_r2.jl` to have been run first.
